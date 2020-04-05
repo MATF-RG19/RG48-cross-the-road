@@ -48,7 +48,8 @@ static void on_display(void) {
     //podesava se projekcija
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90, window_width/(float)window_height, 1, 6);
+    //gluPerspective(90, window_width/(float)window_height, 1, 6);
+    glFrustum(-1, 1, -1, 1, 1, 10);
     
     //podesava se tacka pogleda
     glMatrixMode(GL_MODELVIEW);
@@ -59,6 +60,11 @@ static void on_display(void) {
             0, 1, 0
         );
     
+    glTranslatef(-2, 0, 0);
+    drawCar();
+    glTranslatef(2, 0, 0);
+    
+    glTranslatef(2, 0, 0);
     drawCar();
     
     //nova slika se salje na ekran
