@@ -46,7 +46,7 @@ static void on_display(void) {
     //podesava se projekcija
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(90, window_width/(float)window_height, 1, 4);
+    gluPerspective(90, window_width/(float)window_height, 1, 6);
     
     //podesava se tacka pogleda
     glMatrixMode(GL_MODELVIEW);
@@ -56,13 +56,114 @@ static void on_display(void) {
             0, 0, 0,
             0, 1, 0
         );
-        
+    
+    /*
     //kreira se kocka i primenjuje se geometrijska transformacija na istu
     glPushMatrix();
         glColor3f(1, 0, 0);
         glTranslatef(0, 0.5, 0);
         glScalef(1, 1, 2);
         glutSolidCube(0.8);
+    glPopMatrix();
+    */
+    
+    //kreira se automobil
+    glPushMatrix();
+        glColor3f(1, 0, 0);
+        glTranslatef(0, 0, 0);
+        glScalef(2, 0.2-0.12, 1);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(1, 0, 0);
+        glTranslatef(0, 0.21, 0);
+        glScalef(2, 0.2+0.14, 1);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.6, 0, 0);
+        glTranslatef(0.24, 0.57, 0);
+        glScalef(1, 0.5-0.12, 0.7-0.05);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1, 0.57, 0);
+        glScalef(1-0.41, 0.5-0.25, 0.7-0.04);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1+0.48, 0.57, 0);
+        glScalef(1-0.41-0.4, 0.5-0.25, 0.7-0.04);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1+0.14, 0.57, 0);
+        glScalef(1-0.41+0.42, 0.5-0.25, 0.7-0.04-0.08);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0-0.64, 0.21-0.22, 0-0.01+0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0-0.64, 0.21-0.22, 0+0.01-0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0+0.64, 0.21-0.22, 0+0.01-0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0+0.64, 0.21-0.22, 0-0.01+0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(0.64, -0.01, 0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(-0.64, -0.01, 0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(0.64, -0.01, -0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(-0.64, -0.01, -0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
     glPopMatrix();
     
     //nova slika se salje na ekran
