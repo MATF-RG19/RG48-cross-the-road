@@ -10,6 +10,8 @@ static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 
+void drawCar();
+
 int main(int argc, char **argv) {
     //inicijalizuje se GLUT
     glutInit(&argc, argv);
@@ -57,17 +59,28 @@ static void on_display(void) {
             0, 1, 0
         );
     
-    /*
-    //kreira se kocka i primenjuje se geometrijska transformacija na istu
-    glPushMatrix();
-        glColor3f(1, 0, 0);
-        glTranslatef(0, 0.5, 0);
-        glScalef(1, 1, 2);
-        glutSolidCube(0.8);
-    glPopMatrix();
-    */
+    drawCar();
     
-    //kreira se automobil
+    //nova slika se salje na ekran
+    glutSwapBuffers();
+}
+
+static void on_keyboard(unsigned char key, int x, int y) {
+    switch (key) {
+    case 27:
+        //izlazi se iz programa
+        exit(0);
+        break;
+    }
+}
+
+static void on_reshape(int width, int height) {
+    //pamte se sirina i visina prozora
+    window_width  = width;
+    window_height = height;
+}
+
+void drawCar() {
     glPushMatrix();
         glColor3f(1, 0, 0);
         glTranslatef(0, 0, 0);
@@ -89,6 +102,7 @@ static void on_display(void) {
         glutSolidCube(1);
     glPopMatrix();
     
+    //stakla
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0.1, 0.57, 0);
@@ -110,6 +124,7 @@ static void on_display(void) {
         glutSolidCube(1);
     glPopMatrix();
     
+    //tockovi
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0-0.64, 0.21-0.22, 0-0.01+0.42);
@@ -165,22 +180,4 @@ static void on_display(void) {
         glScalef(2-1.859999, 0.2-0.06, 1-0.78);
         glutSolidCube(1);
     glPopMatrix();
-    
-    //nova slika se salje na ekran
-    glutSwapBuffers();
-}
-
-static void on_keyboard(unsigned char key, int x, int y) {
-    switch (key) {
-    case 27:
-        //izlazi se iz programa
-        exit(0);
-        break;
-    }
-}
-
-static void on_reshape(int width, int height) {
-    //pamte se sirina i visina prozora
-    window_width  = width;
-    window_height = height;
 }
