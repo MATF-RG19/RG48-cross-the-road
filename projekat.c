@@ -11,6 +11,7 @@ static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 
 void drawCar();
+void drawTree();
 
 int main(int argc, char **argv) {
     //inicijalizuje se GLUT
@@ -29,7 +30,6 @@ int main(int argc, char **argv) {
 
     //obavlja se OpenGL inicijalizacija
     glClearColor(0, 0.6, 0, 0);
-    
     glEnable(GL_DEPTH_TEST);
     
     //program ulazi u glavnu petlju
@@ -55,17 +55,17 @@ static void on_display(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(
-            0, 3, 3,
+            1, 3, 3,
             0, 0, 0,
             0, 1, 0
         );
     
-    glTranslatef(-2, 0, 0);
+    glTranslatef(-1, 0, 0);
     drawCar();
-    glTranslatef(2, 0, 0);
+    glTranslatef(1, 0, 0);
     
-    glTranslatef(2, 0, 0);
-    drawCar();
+    glTranslatef(1, 0, 0);
+    drawTree();
     
     //nova slika se salje na ekran
     glutSwapBuffers();
@@ -184,6 +184,21 @@ void drawCar() {
         glColor3f(0.5, 0.5, 0.5);
         glTranslatef(-0.64, -0.01, -0.42);
         glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix(); 
+}
+
+void drawTree(){
+    glPushMatrix();
+        glColor3f(0, 0.35, 0);
+        glRotatef(-90, 1, 0, 0);
+        glutSolidCone(0.5, 2, 10, 10);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.35, 0.2, 0.1);
+        glTranslatef(0, -0.25, 0);
+        glScalef(0.4, 0.5, 0.4);
         glutSolidCube(1);
     glPopMatrix();
 }
