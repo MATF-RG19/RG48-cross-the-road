@@ -79,7 +79,6 @@ static void on_display(void) {
     //podesava se projekcija
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    //glFrustum(-1, 1, -1, 1, 1, 10);
     gluPerspective(60, window_width/(float)window_height, 0.7, 10);
     
     //podesava se tacka pogleda
@@ -181,8 +180,8 @@ static void on_timer(int value) {
         playerPosZ -= move;
         
         //ubrzanje nakon nekog vremena
-        if ((int)playerPosZ == -100)
-            move += 0.03;
+        if ((int)playerPosZ % 50 == 0)
+            move += 0.01;
         
         //nakon nekog vremena ce biti kraj igre
         //ako se pre toga ne pogine, kao pobeda
@@ -266,11 +265,11 @@ void drawPlayer(float x, float z) {
 
 void drawRoad(void) {
     //z osa
-    glBegin(GL_LINES);
+    /*glBegin(GL_LINES);
         glColor3f(1, 1, 1);
         glVertex3f(0, 0, 0);
         glVertex3f(0, 0, -100);
-    glEnd();
+    glEnd();*/
     
     for (float i=-0.5; i < 0.5; i+=0.5) {
         setMaterial("road");
