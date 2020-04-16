@@ -4,6 +4,14 @@
 #include<stdbool.h>
 #include<string.h>
 #include<unistd.h>
+#include"image.h"
+
+//imena fajlova sa teksturama
+#define FILENAME0 "grass.bmp"
+#define FILENAME1 "sky.bmp"
+
+//identifikatori tekstura
+static GLuint names[2];
 
 //dimenzije prozora
 static int window_width, window_height;
@@ -11,7 +19,7 @@ static int window_width, window_height;
 float playerPosX = 2.5;
 float playerPosZ = -5;
 float playerLength = 0.1;
-float lengthOfRoad = 1.5;
+float lengthOfRoad = 1.5; 
 float playerStepForward  =  1.2;
 float playerStepBackward = -1.2;
 
@@ -27,9 +35,6 @@ static void on_keyboard(unsigned char key, int x, int y);
 static void on_reshape(int width, int height);
 static void on_timer(int value);
 
-void drawCar();
-void drawTree();
-
 bool canMoveThisWay(unsigned char key);
 
 void setLighting();
@@ -37,6 +42,9 @@ void setMaterial(char *option);
 
 void drawPlayer(float x, float z);
 void drawRoad();
+void drawCar();
+void drawTree();
+void drawGrass(); 
 
 int main(int argc, char **argv) {
     //inicijalizuje se GLUT
@@ -62,6 +70,58 @@ int main(int argc, char **argv) {
     
     //osvetljenje
     setLighting();
+    
+    //objekat koji predstavlja teksturu ucitanu iz fajla
+    Image *image;
+    
+    //ukljucuju se teksture
+    glEnable(GL_TEXTURE_2D);
+    
+    glTexEnvf(GL_TEXTURE_ENV,
+              GL_TEXTURE_ENV_MODE,
+              GL_REPLACE);
+    
+    //inicijalizuje se objekat koji ce sadrzati teksture ucitane iz fajla
+    image = image_init(0, 0);
+    
+    //generisu se identifikatori tekstura
+    glGenTextures(2, names);
+    
+    //kreira se prva tekstura
+    image_read(image, FILENAME0);
+    
+    glBindTexture(GL_TEXTURE_2D, names[0]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    
+    //kreira se druga tekstura
+    image_read(image, FILENAME1);
+
+    glBindTexture(GL_TEXTURE_2D, names[1]);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D,
+                    GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+                 image->width, image->height, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, image->pixels);
+    
+    //iskljucujemo aktivnu teksturu
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    //unistava se objekat za citanje tekstura iz fajla
+    image_done(image);
     
     //program ulazi u glavnu petlju
     glutMainLoop();
@@ -90,11 +150,32 @@ static void on_display(void) {
             0,   1,   0
         );
     
-    //iscrtavamo igraca
-    drawPlayer((float)(playerPosX/2), playerPosZ);
+    //postavljamo pozadinu
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, names[1]);
+
+        glBegin(GL_POLYGON);
+            glTexCoord2f(0, 0);
+            glVertex3f(-12, -17.5, playerPosZ);
+            
+            glTexCoord2f(1, 0);
+            glVertex3f(14, -17.5, playerPosZ);
+            
+            glTexCoord2f(1, 3);
+            glVertex3f(14, 12, playerPosZ-12);
+            
+            glTexCoord2f(0, 3);
+            glVertex3f(-12, 12, playerPosZ-12);
+        glEnd();
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
+    glPopMatrix();
     
-    //iscrtavamo put
+    //iscrtavamo igraca, put i travu
+    drawPlayer((float)(playerPosX/2), playerPosZ);
     drawRoad();
+    drawGrass();
     
     //nova slika se salje na ekran
     glutSwapBuffers();
@@ -125,7 +206,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
         
         case 'd':
         case 'D':
-            if (animation_ongoing) {
+            if (animation_ongoing) {        
                 //krecemo se na desnu stranu ako mozemo
                 if (canMoveThisWay('d'))
                     playerPosX += playerStepForward;
@@ -134,7 +215,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
         
         case 'r':
         case 'R':
-            animation_ongoing = true;
+            animation_ongoing  = true;
             playerPosX = 2.5;
             playerPosZ = -5;
             move = 0.1;
@@ -199,13 +280,13 @@ void setLighting() {
     //odredjujemo vektore
     GLfloat position [] = {10, 10, 10, 1};
     GLfloat ambient  [] = {0.4, 0.4, 0.4, 1};
-    GLfloat diffuse  [] = {1, 1, 1, 1};
+    GLfloat diffuse  [] = {0.8, 0.8, 0.8, 1};
     GLfloat specular [] = {1, 1, 1, 1};
     
     //inicijalizujemo osobine osvetljenja
     glLightfv(GL_LIGHT0, GL_POSITION, position);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
+    glLightfv(GL_LIGHT0, GL_AMBIENT,  ambient);
+    glLightfv(GL_LIGHT0, GL_DIFFUSE,  diffuse);
     glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
 }
 
@@ -224,12 +305,12 @@ void setMaterial(char *option) {
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
         glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     }
-    //linije na putu
-    else if (strcmp("lines", option)==0) {
+    //trava
+    else if (strcmp("grass", option)==0) {
         //odredjujemo vektore
         GLfloat specular [] = {0, 0, 0, 0};
-        GLfloat ambient  [] = {0.205, 0.231, 0.211, 1};
-        GLfloat diffuse  [] = {0.201, 0.201, 0.201, 1};
+        GLfloat ambient  [] = {0.1, 0.87, 0.1, 0.8};
+        GLfloat diffuse  [] = {0.1, 0.87, 0.1, 1};
         int shininess = 100;
         
         //inicijalizujemo osobine materijala
@@ -238,32 +319,44 @@ void setMaterial(char *option) {
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
         glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     }
-    //igrac
-    else if (strcmp("player", option)==0) {
-        //odredjujemo vektore
-        GLfloat specular [] = {1, 0, 0, 0};
-        GLfloat ambient  [] = {1, 0, 0, 1};
-        GLfloat diffuse  [] = {1, 0, 0, 1};
-        int shininess = 100;
-        
-        //inicijalizujemo osobine materijala
-        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
-        glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
-        glMaterialf(GL_FRONT, GL_SHININESS, shininess);	
-    }
 }
 
-void drawPlayer(float x, float z) {
-    //za sada loptica
-    setMaterial("player");
+void drawGrass(void) {
+    setMaterial("grass");
     glPushMatrix();
-        glTranslatef(x, -0.5, z);
-        glutSolidSphere(playerLength, 10, 10);
+        glTranslatef(-0.55, -0.75, playerPosZ);
+        glScalef(lengthOfRoad, 0.3, 500);
+        glutSolidCube(1);
     glPopMatrix();
+    
+    glPushMatrix();
+        glTranslatef(2.95, -0.75, playerPosZ);
+        glScalef(lengthOfRoad, 0.3, 500);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    //jelkice
+    glDisable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    for (int i=1; i<7; i++) {
+        glPushMatrix();
+            glTranslatef(2.95, -0.5, playerPosZ-i);
+            glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+            drawTree();
+        glPopMatrix();
+    }
+    for (int i=1; i<7; i++) {
+        glPushMatrix();
+            glTranslatef(-0.45, -0.5, playerPosZ-i);
+            glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+            drawTree();
+        glPopMatrix();
+    }
+    glDisable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
 }
 
-void drawRoad(void) {
+void drawRoad() {
     //z osa
     /*glBegin(GL_LINES);
         glColor3f(1, 1, 1);
@@ -282,21 +375,145 @@ void drawRoad(void) {
         //iscrtavamo isprekidane linije po putu
         for (int j=10; (float)j > -500; j--) {
             if (j%2 == 0) {
-                setMaterial("lines");
+                glEnable(GL_COLOR_MATERIAL);
                 glPushMatrix();
-                    glTranslatef((lengthOfRoad + i), -0.75, j);
-                    glScalef(0.05, 0.32, 1);
-                    glutSolidCube(1);
-                glPopMatrix();
-            }
-            else {
-                setMaterial("road");
-                glPushMatrix();
+                    glColor3f(0.5, 0.5, 0.5);
                     glTranslatef((lengthOfRoad + i), -0.75, j);
                     glScalef(0.05, 0.32, 1);
                     glutSolidCube(1);
                 glPopMatrix();
             }
         }
+        glDisable(GL_COLOR_MATERIAL);
     }
+}
+
+void drawPlayer(float x, float z) {
+    //glDisable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    glPushMatrix();
+        glTranslatef(x, -0.5, z);
+        glRotatef(90, 0, 1, 0);
+        glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+        drawCar();
+    glPopMatrix();
+    glDisable(GL_COLOR_MATERIAL);
+    //glEnable(GL_LIGHTING);
+}
+
+void drawCar() {
+    glPushMatrix();
+        glColor3f(1, 0, 0);
+        glTranslatef(0, 0, 0);
+        glScalef(2, 0.2-0.12, 1);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(1, 0, 0);
+        glTranslatef(0, 0.21, 0);
+        glScalef(2, 0.2+0.14, 1);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.6, 0, 0);
+        glTranslatef(0.24, 0.57, 0);
+        glScalef(1, 0.5-0.12, 0.7-0.05);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    //stakla
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1, 0.57, 0);
+        glScalef(1-0.41, 0.5-0.25, 0.7-0.04);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1+0.48, 0.57, 0);
+        glScalef(1-0.41-0.4, 0.5-0.25, 0.7-0.04);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0.1+0.14, 0.57, 0);
+        glScalef(1-0.41+0.42, 0.5-0.25, 0.7-0.04-0.08);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    //tockovi
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0-0.64, 0.21-0.22, 0-0.01+0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0-0.64, 0.21-0.22, 0+0.01-0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0+0.64, 0.21-0.22, 0+0.01-0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0, 0, 0);
+        glTranslatef(0+0.64, 0.21-0.22, 0-0.01+0.42);
+        glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(0.64, -0.01, 0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(-0.64, -0.01, 0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(0.64, -0.01, -0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.5, 0.5);
+        glTranslatef(-0.64, -0.01, -0.42);
+        glScalef(2-1.859999, 0.2-0.06, 1-0.78);
+        glutSolidCube(1);
+    glPopMatrix(); 
+}
+
+void drawTree() {
+    glPushMatrix();
+        glColor3f(0, 0.4, 0);
+        glRotatef(-90, 1, 0, 0);
+        glutSolidCone(0.5, 2, 10, 10);
+    glPopMatrix();
+    
+    glPushMatrix();
+        glColor3f(0.5, 0.2, 0.1);
+        glTranslatef(0, -0.25, 0);
+        glScalef(0.4, 0.5, 0.4);
+        glutSolidCube(1);
+    glPopMatrix();
 }

@@ -1,12 +1,16 @@
-PROGRAM    = cross_the_road
-CC	   = gcc
-#CFLAGS    = -Wall 
-GLFLAGS    = -lglut -lGLU -lGL -lm
+PROGRAM = cross_the_road
+CC      = gcc
+CFLAGS  = -g -Wall -I/usr/X11R6/include -I/usr/pkg/include
+LDFLAGS = -L/usr/X11R6/lib -L/usr/pkg/lib
+LDLIBS  = -lglut -lGLU -lGL
 
-$(PROGRAM): projekat.c 
-	$(CC) -o $(PROGRAM) projekat.c $(GLFLAGS)	
+$(PROGRAM): projekat.o image.o
+	$(CC) $(LDFLAGS) -o $(PROGRAM) image.o projekat.o $(LDLIBS)
 
-.PHONY: clean 
+.PHONY: clean dist
 
-clean: 
+clean:
 	-rm *.o $(PROGRAM) *core
+
+dist: clean
+	-tar -chvj -C .. -f ../$(PROGRAM).tar.bz2 $(PROGRAM)
