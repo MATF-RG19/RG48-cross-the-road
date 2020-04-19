@@ -5,6 +5,7 @@
 #include<string.h>
 #include<unistd.h>
 #include"image.h"
+#include<time.h>
 
 //imena fajlova sa teksturama
 #define FILENAME0 "grass.bmp"
@@ -29,6 +30,14 @@ int pauseStart = 1;
 //brzina kojom se igrac krece
 float move = 0.1;
 
+//niz prepreka za svaku traku
+int leftWalls[500];
+int midWalls[500];
+int rightWalls[500];
+
+//za postavljanje prepreka
+int ind = 0;
+
 //deklaracije callback funkcija
 static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
@@ -45,6 +54,10 @@ void drawRoad();
 void drawCar();
 void drawTree();
 void drawGrass(); 
+
+void setWall();
+void drawWall();
+int is_crashed();
 
 int main(int argc, char **argv) {
     //inicijalizuje se GLUT
@@ -123,6 +136,9 @@ int main(int argc, char **argv) {
     //unistava se objekat za citanje tekstura iz fajla
     image_done(image);
     
+    //postavljamo "sito" kako bismo koristili rand za generisanje prepreka
+    srand(time(NULL));
+    
     //program ulazi u glavnu petlju
     glutMainLoop();
 
@@ -176,6 +192,11 @@ static void on_display(void) {
     drawPlayer((float)(playerPosX/2), playerPosZ);
     drawRoad();
     drawGrass();
+    
+    //prepreke
+    drawWall();
+    if (is_crashed())
+        animation_ongoing = false;
     
     //nova slika se salje na ekran
     glutSwapBuffers();
@@ -262,11 +283,11 @@ static void on_timer(int value) {
         
         //ubrzanje nakon nekog vremena
         if ((int)playerPosZ % 50 == 0)
-            move += 0.01;
+            move += 0.002;
         
         //nakon nekog vremena ce biti kraj igre
         //ako se pre toga ne pogine, kao pobeda
-        if ((int)playerPosZ == -300)
+        if ((int)playerPosZ == -450)
             animation_ongoing = false;
     }
     //forsira se ponovno iscrtavanje prozora
@@ -319,6 +340,20 @@ void setMaterial(char *option) {
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
         glMaterialf(GL_FRONT, GL_SHININESS, shininess);
     }
+    //prepreke
+    else if (strcmp("wall", option)==0) {
+        //odredjujemo vektore
+        GLfloat specular [] = {0, 0, 0, 0};
+        GLfloat ambient  [] = {0.334, 0.111, 0.552, 1};
+        GLfloat diffuse  [] = {0.552, 0.111, 0.552, 1};
+        int shininess = 100;
+        
+        //inicijalizujemo osobine materijala
+        glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, diffuse);
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular);
+        glMaterialf(GL_FRONT, GL_SHININESS, shininess);
+    }
 }
 
 void drawGrass(void) {
@@ -357,13 +392,14 @@ void drawGrass(void) {
 }
 
 void drawRoad() {
+    /*
     //z osa
-    /*glBegin(GL_LINES);
+    glBegin(GL_LINES);
         glColor3f(1, 1, 1);
         glVertex3f(0, 0, 0);
-        glVertex3f(0, 0, -100);
-    glEnd();*/
-    
+        glVertex3f(0, 0, -400);
+    glEnd();
+    */
     for (float i=-0.5; i < 0.5; i+=0.5) {
         setMaterial("road");
         glPushMatrix();
@@ -389,7 +425,6 @@ void drawRoad() {
 }
 
 void drawPlayer(float x, float z) {
-    //glDisable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
     glPushMatrix();
         glTranslatef(x, -0.5, z);
@@ -398,7 +433,6 @@ void drawPlayer(float x, float z) {
         drawCar();
     glPopMatrix();
     glDisable(GL_COLOR_MATERIAL);
-    //glEnable(GL_LIGHTING);
 }
 
 void drawCar() {
@@ -516,4 +550,86 @@ void drawTree() {
         glScalef(0.4, 0.5, 0.4);
         glutSolidCube(1);
     glPopMatrix();
+}
+
+void setWall() {    
+    for (int i=0; i<500; i++) {
+        leftWalls[i] = 0;
+        midWalls[i]  = 0;
+        rightWalls[i]= 0;
+    }
+    
+    for (int i=0, j=0, k=0, l=20; l > -400; l--) {
+        //prva traka
+        if (((rand() % 1000) / 100) < 3 && l%7 == 0) {
+            leftWalls[i] = l-23;
+            i++;
+        }
+        //srednja traka
+        if (((rand() % 1000) / 100) < 3 && l%7 == 0) {
+            midWalls[j] = l-31;
+            j++;
+        }
+        //treca traka
+        if (((rand() % 1000) / 100) < 3 && l%7 == 0) {
+            rightWalls[k] = l-27;
+            k++;
+        }
+    }
+}
+
+void drawWall() {
+    for (int i=0; i<500; i++) {
+        if (ind == 0) {
+            setWall();
+            ind = 1;
+        }
+        
+        if (leftWalls[i] != 0) {
+            setMaterial("wall");
+            glPushMatrix();
+                glTranslatef(0.6, -0.75, leftWalls[i]);
+                glScalef(lengthOfRoad/3 + 0.25, 0.85, 1);
+                glutSolidCube(1);
+            glPopMatrix();
+        }
+        if (midWalls[i] != 0) {
+            setMaterial("wall");
+            glPushMatrix();
+                glTranslatef(1.25, -0.75, midWalls[i]);
+                glScalef(lengthOfRoad/3 - 0.085, 0.85, 1);
+                glutSolidCube(1);
+            glPopMatrix();
+        }
+        if (rightWalls[i] != 0) {
+            setMaterial("wall");
+            glPushMatrix();
+                glTranslatef(1.85, -0.75, rightWalls[i]);
+                glScalef(lengthOfRoad/3 + 0.1, 0.85, 1);
+                glutSolidCube(1);
+            glPopMatrix();
+        }
+    }
+}
+
+int is_crashed() {
+    for (int i=0; i<500; i++) {
+
+        if (playerPosX < 2.4) {
+            if (leftWalls[i] != 0)
+                if (playerPosZ <= leftWalls[i]+1 && playerPosZ >= leftWalls[i]-0.4)
+                    return 1;
+        }
+        else if (playerPosX == 2.5) {
+            if (midWalls[i] != 0) 
+                if (playerPosZ <= midWalls[i]+1 && playerPosZ >= midWalls[i]-0.4)
+                    return 1;
+        }
+        else {
+            if (rightWalls[i] != 0) 
+                if (playerPosZ <= rightWalls[i]+1 && playerPosZ >= rightWalls[i]-0.4)
+                    return 1;
+        }
+    }
+    return 0;
 }
