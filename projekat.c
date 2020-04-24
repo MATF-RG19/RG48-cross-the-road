@@ -44,6 +44,11 @@ int rightCoins[500];
 int indWalls = 0;
 int indCoins = 0;
 
+//indikatori da su dijamanti pokupljeni
+int leftCoinsInd[500];
+int midCoinsInd[500];
+int rightCoinsInd[500];
+
 int score = 0;
 
 //deklaracije callback funkcija
@@ -673,6 +678,10 @@ void setCoins() {
         leftCoins[i] = 0;
         midCoins[i]  = 0;
         rightCoins[i]= 0;
+        
+        leftCoinsInd[i] = 0;
+        midCoinsInd[i]  = 0;
+        rightCoinsInd[i]= 0;
     }
     
     for (int i=0, j=0, k=0, l=20; l > -400; l--) {
@@ -700,8 +709,8 @@ void drawCoins() {
             setCoins();
             indCoins = 1;
         }
-        
-        if (leftCoins[i] != 0) {
+                              //vise se ne iscrtava na istoj poziciji
+        if (leftCoins[i] != 0 && leftCoinsInd[i] != 1) {
             setMaterial("coin");
             glPushMatrix();
                 glTranslatef(0.63, -0.5, leftCoins[i]);
@@ -710,7 +719,7 @@ void drawCoins() {
                 glutSolidIcosahedron();
             glPopMatrix();
         }
-        if (midCoins[i] != 0) {
+        if (midCoins[i] != 0 && midCoinsInd[i] != 1) {
             setMaterial("coin");
             glPushMatrix();
                 glTranslatef(1.25, -0.5, midCoins[i]);
@@ -719,7 +728,7 @@ void drawCoins() {
                 glutSolidIcosahedron();
             glPopMatrix();
         }
-        if (rightCoins[i] != 0) {
+        if (rightCoins[i] != 0 && rightCoinsInd[i] != 1) {
             setMaterial("coin");
             glPushMatrix();
                 glTranslatef(1.85, -0.5, rightCoins[i]);
@@ -734,21 +743,26 @@ void drawCoins() {
 int is_coin_collected() {
     for (int i=0; i<500; i++) {
         
-        if (playerPosX < 2.4) {
-            if (leftCoins[i] != 0)
+        if (playerPosX < 2.4) {   //i ne moze biti ponovo pokupljen
+            if (leftCoins[i] != 0 && leftCoinsInd[i] != 1)
                 if (playerPosZ <= leftCoins[i] && playerPosZ >= leftCoins[i]-0.1) {
+                    leftCoinsInd[i] = 1; //ako je dijamant jednom pokupljen
                     return 1;
                 }
         }
         else if (playerPosX == 2.5) {
-            if (midCoins[i] != 0) 
-                if (playerPosZ <= midCoins[i] && playerPosZ >= midCoins[i]-0.1)
+            if (midCoins[i] != 0 && midCoinsInd[i] != 1) 
+                if (playerPosZ <= midCoins[i] && playerPosZ >= midCoins[i]-0.1) {
+                    midCoinsInd[i] = 1;
                     return 1;
+                }
         }
         else {
-            if (rightCoins[i] != 0) 
-                if (playerPosZ <= rightCoins[i] && playerPosZ >= rightCoins[i]-0.1)
+            if (rightCoins[i] != 0 && rightCoinsInd[i] != 1) 
+                if (playerPosZ <= rightCoins[i] && playerPosZ >= rightCoins[i]-0.1) {
+                    rightCoinsInd[i] = 1;
                     return 1;
+                }
         }
     }
     return 0;
