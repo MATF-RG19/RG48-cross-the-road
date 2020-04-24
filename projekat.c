@@ -745,21 +745,21 @@ int is_coin_collected() {
         
         if (playerPosX < 2.4) {   //i ne moze biti ponovo pokupljen
             if (leftCoins[i] != 0 && leftCoinsInd[i] != 1)
-                if (playerPosZ <= leftCoins[i] && playerPosZ >= leftCoins[i]-0.1) {
+                if (playerPosZ <= leftCoins[i]+0.3 && playerPosZ >= leftCoins[i]-0.2) {
                     leftCoinsInd[i] = 1; //ako je dijamant jednom pokupljen
                     return 1;
                 }
         }
         else if (playerPosX == 2.5) {
             if (midCoins[i] != 0 && midCoinsInd[i] != 1) 
-                if (playerPosZ <= midCoins[i] && playerPosZ >= midCoins[i]-0.1) {
+                if (playerPosZ <= midCoins[i]+0.3 && playerPosZ >= midCoins[i]-0.2) {
                     midCoinsInd[i] = 1;
                     return 1;
                 }
         }
         else {
             if (rightCoins[i] != 0 && rightCoinsInd[i] != 1) 
-                if (playerPosZ <= rightCoins[i] && playerPosZ >= rightCoins[i]-0.1) {
+                if (playerPosZ <= rightCoins[i]+0.3 && playerPosZ >= rightCoins[i]-0.2) {
                     rightCoinsInd[i] = 1;
                     return 1;
                 }
