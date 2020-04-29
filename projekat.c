@@ -51,6 +51,9 @@ int rightCoinsInd[500];
 
 int score = 0;
 
+//indikator za poraz
+int indGameOver = 0;
+
 //deklaracije callback funkcija
 static void on_display(void);
 static void on_keyboard(unsigned char key, int x, int y);
@@ -75,6 +78,9 @@ int is_crashed();
 void setCoins();
 void drawCoins();
 int is_coin_collected();
+
+void writeScore();
+void end_game();
 
 int main(int argc, char **argv) {
     //inicijalizuje se GLUT
@@ -205,22 +211,27 @@ static void on_display(void) {
         glBindTexture(GL_TEXTURE_2D, 0);
     glPopMatrix();
     
-    //iscrtavamo igraca, put i travu
+    //iscrtavamo igraca, put, travu
     drawPlayer((float)(playerPosX/2), playerPosZ);
     drawRoad();
     drawGrass();
     
     //prepreke
     drawWalls();
-    if (is_crashed())
+    if (is_crashed()) {
         animation_ongoing = false;
+        indGameOver = 1;
+        glutDisplayFunc(end_game);
+        glutPostRedisplay();
+    }
     
-    //dijamanti
+    //dijamante
     drawCoins();
     if (is_coin_collected()) {
         score++;
-        printf("%d\n", score);
+        //printf("%d\n", score);
     }
+    writeScore();
     
     //nova slika se salje na ekran
     glutSwapBuffers();
@@ -258,6 +269,7 @@ static void on_keyboard(unsigned char key, int x, int y) {
             }
         break;
         
+        //restart dugme
         case 'r':
         case 'R':
             animation_ongoing = true;
@@ -266,6 +278,9 @@ static void on_keyboard(unsigned char key, int x, int y) {
             move = 0.1;
             sleep(1);
             score = 0;
+            indCoins = 0;
+            glutDisplayFunc(on_display);
+            indGameOver = 0;
         break;
         
         //ako neparan broj puta kliknemo na p ili P, igra se pauzira
@@ -312,8 +327,11 @@ static void on_timer(int value) {
         
         //nakon nekog vremena ce biti kraj igre
         //ako se pre toga ne pogine, kao pobeda
-        if ((int)playerPosZ == -450)
+        if ((int)playerPosZ == -450) {
             animation_ongoing = false;
+            glutDisplayFunc(end_game);
+            glutPostRedisplay();
+        }
     }
     //forsira se ponovno iscrtavanje prozora
     glutPostRedisplay();
@@ -766,4 +784,92 @@ int is_coin_collected() {
         }
     }
     return 0;
+}
+
+void writeScore() {
+    setMaterial("wall");
+    glRasterPos3f(-0.7, 0.5, playerPosZ-2);
+    
+    char score_display[50] = "Score: ";
+    char score_value[50];
+    
+    sprintf(score_value, " %d ", score);
+    strcat(score_display, score_value);
+    int len = (int)strlen(score_display);
+    for (int i=0; i<len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, score_display[i]);
+}
+
+void end_game() {
+    //brise se prethodni sadrzaj prozora
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    //podesava se viewport
+    glViewport(0, 0, window_width, window_height);
+    
+    //podesava se projekcija
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60, window_width/(float)window_height, 0.7, 10);
+    
+    //podesava se tacka pogleda
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(
+            1.2, 0.4, 2+playerPosZ,
+            1.2, 0,   1+playerPosZ,
+            0,   1,   0
+        );
+    
+    //postavljamo pozadinu
+    glPushMatrix();
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, names[1]);
+
+        glBegin(GL_POLYGON);
+            glTexCoord2f(0, 0);
+            glVertex3f(-10, -17.5, playerPosZ);
+            
+            glTexCoord2f(1, 0);
+            glVertex3f(14, -17.5, playerPosZ);
+            
+            glTexCoord2f(1, 3);
+            glVertex3f(14, 12, playerPosZ-12);
+            
+            glTexCoord2f(0, 3);
+            glVertex3f(-10, 12, playerPosZ-12);
+        glEnd();
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
+    glPopMatrix();
+    
+    //ispisujemo poruku na ekran
+    char message[50];
+    setMaterial("wall");
+    
+    if (indGameOver) {
+        glRasterPos3f(-0.12, 0.1, playerPosZ-2);
+        sprintf(message, "GAME OVER"); 
+        for (int i=0; i<9; i++)
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, message[i]);
+    }
+    else {
+        glRasterPos3f(-0.38, 0.1, playerPosZ-2);
+        sprintf(message, "CONGRATULATIONS!!!"); 
+        for (int i=0; i<18; i++)
+            glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, message[i]);
+    }
+    
+    glRasterPos3f(-0.13, -0.1, playerPosZ-2);
+    sprintf(message, "Your score is %d", score);  
+    int len = (int)strlen(message);
+    for (int i=0; i<len; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, message[i]);
+    
+    glRasterPos3f(-0.4, -0.3, playerPosZ-2);
+    sprintf(message, "Press r/R to start a new game");  
+    for (int i=0; i<30; i++)
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, message[i]);
+    
+    glutSwapBuffers();
 }
