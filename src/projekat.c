@@ -73,6 +73,7 @@ void drawGrass();
 
 void setWalls();
 void drawWalls();
+void drawBear();
 int is_crashed();
 
 void setCoins();
@@ -540,6 +541,7 @@ void drawCar() {
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0-0.64, 0.21-0.22, 0-0.01+0.42);
+        glRotatef(playerPosZ*50, 0, 0, 1);
         glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
         glutSolidCube(1);
     glPopMatrix();
@@ -547,6 +549,7 @@ void drawCar() {
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0-0.64, 0.21-0.22, 0+0.01-0.42);
+        glRotatef(playerPosZ*50, 0, 0, 1);
         glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
         glutSolidCube(1);
     glPopMatrix();
@@ -554,6 +557,7 @@ void drawCar() {
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0+0.64, 0.21-0.22, 0+0.01-0.42);
+        glRotatef(playerPosZ*50, 0, 0, 1);
         glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
         glutSolidCube(1);
     glPopMatrix();
@@ -561,6 +565,7 @@ void drawCar() {
     glPushMatrix();
         glColor3f(0, 0, 0);
         glTranslatef(0+0.64, 0.21-0.22, 0-0.01+0.42);
+        glRotatef(playerPosZ*50, 0, 0, 1);
         glScalef(2+0.01-1.669999, 0.2+0.14+0.01-0.02, 1-0.7-0.07);
         glutSolidCube(1);
     glPopMatrix();
@@ -635,6 +640,36 @@ void setWalls() {
     }
 }
 
+void drawBear() {
+    float telo = 0.7;
+    glPushMatrix();
+        glColor3f(0.5, 0.2, 0.1);
+        glTranslatef(0, telo/3, 0);
+        glScalef(1.1, 0.4, 0.9);
+        glutSolidSphere(telo, 100, 100);
+    glPopMatrix();
+    
+    float glava = 0.8 * telo;
+    glPushMatrix();
+        glColor3f(0.8, 0.4, 0.2);
+        glTranslatef(0, telo, 0);
+        glScalef(1, 0.5, 1);
+        glutSolidSphere(glava, 100, 100);
+    glPopMatrix();
+    
+    float uvo = 0.25 * telo;
+    glPushMatrix();
+        glColor3f(0.5, 0.2, 0.1);
+        glTranslatef(-0.35, telo+glava-uvo, 0);
+        glutSolidSphere(uvo, 100, 100);
+    glPopMatrix();
+    glPushMatrix();
+        glColor3f(0.5, 0.2, 0.1);
+        glTranslatef(0.35, telo+glava-uvo, 0);	
+        glutSolidSphere(uvo, 100, 100);
+    glPopMatrix(); 
+}
+
 void drawWalls() {
     for (int i=0; i<500; i++) {
         if (indWalls == 0) {
@@ -643,28 +678,69 @@ void drawWalls() {
         }
         
         if (leftWalls[i] != 0) {
-            setMaterial("wall");
-            glPushMatrix();
-                glTranslatef(0.6, -0.75, leftWalls[i]);
-                glScalef(lengthOfRoad/3 + 0.25, 0.85, 1);
-                glutSolidCube(1);
-            glPopMatrix();
+            if (leftWalls[i] % 10 == 0) {
+                glDisable(GL_LIGHTING);
+                glEnable(GL_COLOR_MATERIAL);
+                glPushMatrix();
+                    glTranslatef(0.6, -0.6, leftWalls[i]);
+                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                    drawBear();
+                glPopMatrix();
+                glDisable(GL_COLOR_MATERIAL);
+                glEnable(GL_LIGHTING);
+            }
+            else {
+                setMaterial("wall");
+                glPushMatrix();
+                    glTranslatef(0.6, -0.75, leftWalls[i]);
+                    glScalef(lengthOfRoad/3 + 0.25, 0.85, 1);
+                    glutSolidCube(1);
+                glPopMatrix();
+            }
         }
+        
         if (midWalls[i] != 0) {
-            setMaterial("wall");
-            glPushMatrix();
-                glTranslatef(1.25, -0.75, midWalls[i]);
-                glScalef(lengthOfRoad/3 - 0.085, 0.85, 1);
-                glutSolidCube(1);
-            glPopMatrix();
+            if (midWalls[i] % 10 == 0) {
+                glDisable(GL_LIGHTING);
+                glEnable(GL_COLOR_MATERIAL);
+                glPushMatrix();
+                    glTranslatef(1.25, -0.6, midWalls[i]);
+                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                    drawBear();
+                glPopMatrix();
+                glDisable(GL_COLOR_MATERIAL);
+                glEnable(GL_LIGHTING);
+            }
+            else {
+                setMaterial("wall");
+                glPushMatrix();
+                    glTranslatef(1.25, -0.75, midWalls[i]);
+                    glScalef(lengthOfRoad/3 - 0.085, 0.85, 1);
+                    glutSolidCube(1);
+                glPopMatrix();
+            }
         }
+        
         if (rightWalls[i] != 0) {
-            setMaterial("wall");
-            glPushMatrix();
-                glTranslatef(1.85, -0.75, rightWalls[i]);
-                glScalef(lengthOfRoad/3 + 0.1, 0.85, 1);
-                glutSolidCube(1);
-            glPopMatrix();
+            if (midWalls[i] % 10 == 0) {
+                glDisable(GL_LIGHTING);
+                glEnable(GL_COLOR_MATERIAL);
+                glPushMatrix();
+                    glTranslatef(1.85, -0.6, rightWalls[i]);
+                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                    drawBear();
+                glPopMatrix();
+                glDisable(GL_COLOR_MATERIAL);
+                glEnable(GL_LIGHTING);
+            }
+            else {
+                setMaterial("wall");
+                glPushMatrix();
+                    glTranslatef(1.85, -0.75, rightWalls[i]);
+                    glScalef(lengthOfRoad/3 + 0.1, 0.85, 1);
+                    glutSolidCube(1);
+                glPopMatrix();
+            }
         }
     }
 }
