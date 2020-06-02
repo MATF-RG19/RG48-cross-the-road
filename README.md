@@ -19,6 +19,6 @@ Projekat predstavlja igru u kojoj se automobil kreće, izbegava prepreke i sakup
 ```shell
 git clone https://github.com/MATF-RG19/RG48-cross-the-road
 ```
-* Pozicionirajte se u direktorijum `RG48-cross-the-road/src/` <br>
+* Pozicionirajte se u direktorijum `RG48-cross-the-road/src` <br>
 * Pokrenite Makefile komandom `make` <br>
 * Pokrenite igricu komandom `./cross_the_road`
