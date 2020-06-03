@@ -324,7 +324,7 @@ static void on_timer(int value) {
         
         //ubrzanje nakon nekog vremena
         if ((int)playerPosZ % 50 == 0)
-            move += 0.001;
+            move += 0.0015;
         
         //nakon nekog vremena ce biti kraj igre
         //ako se pre toga ne pogine, kao pobeda
@@ -451,14 +451,6 @@ void drawGrass(void) {
 }
 
 void drawRoad() {
-    /*
-    //z osa
-    glBegin(GL_LINES);
-        glColor3f(1, 1, 1);
-        glVertex3f(0, 0, 0);
-        glVertex3f(0, 0, -400);
-    glEnd();
-    */
     for (float i=-0.5; i < 0.5; i+=0.5) {
         setMaterial("road");
         glPushMatrix();
