@@ -323,7 +323,7 @@ static void on_timer(int value) {
         playerPosZ -= move;
         
         //ubrzanje nakon nekog vremena
-        if ((int)playerPosZ % 100 == 0)
+        if ((int)playerPosZ % 50 == 0)
             move += 0.001;
         
         //nakon nekog vremena ce biti kraj igre
@@ -679,69 +679,39 @@ void drawWalls() {
         }
         
         if (leftWalls[i] < playerPosZ+2 && leftWalls[i] > playerPosZ-12) {
-            if (leftWalls[i] % 5 == 0) {
-                glDisable(GL_LIGHTING);
-                glEnable(GL_COLOR_MATERIAL);
-                glPushMatrix();
-                    glTranslatef(0.6, -0.6, leftWalls[i]);
-                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
-                    drawBear();
-                glPopMatrix();
-                glDisable(GL_COLOR_MATERIAL);
-                glEnable(GL_LIGHTING);
-            }
-            else {
-                setMaterial("wall");
-                glPushMatrix();
-                    glTranslatef(0.6, -0.75, leftWalls[i]);
-                    glScalef(lengthOfRoad/3 + 0.25, 0.85, 1);
-                    glutSolidCube(1);
-                glPopMatrix();
-            }
+            glDisable(GL_LIGHTING);
+            glEnable(GL_COLOR_MATERIAL);
+            glPushMatrix();
+                glTranslatef(0.6, -0.6, leftWalls[i]);
+                glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                drawBear();
+            glPopMatrix();
+            glDisable(GL_COLOR_MATERIAL);
+            glEnable(GL_LIGHTING);
         }
         
         if (midWalls[i] < playerPosZ+2 && midWalls[i] > playerPosZ-12) {
-            if (midWalls[i] % 5 == 0) {
-                glDisable(GL_LIGHTING);
-                glEnable(GL_COLOR_MATERIAL);
-                glPushMatrix();
-                    glTranslatef(1.25, -0.6, midWalls[i]);
-                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
-                    drawBear();
-                glPopMatrix();
-                glDisable(GL_COLOR_MATERIAL);
-                glEnable(GL_LIGHTING);
-            }
-            else {
-                setMaterial("wall");
-                glPushMatrix();
-                    glTranslatef(1.25, -0.75, midWalls[i]);
-                    glScalef(lengthOfRoad/3 - 0.085, 0.85, 1);
-                    glutSolidCube(1);
-                glPopMatrix();
-            }
+            glDisable(GL_LIGHTING);
+            glEnable(GL_COLOR_MATERIAL);
+            glPushMatrix();
+                glTranslatef(1.25, -0.6, midWalls[i]);
+                glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                drawBear();
+            glPopMatrix();
+            glDisable(GL_COLOR_MATERIAL);
+            glEnable(GL_LIGHTING);
         }
         
         if (rightWalls[i] < playerPosZ+2 && rightWalls[i] > playerPosZ-12) {
-            if (midWalls[i] % 5 == 0) {
-                glDisable(GL_LIGHTING);
-                glEnable(GL_COLOR_MATERIAL);
-                glPushMatrix();
-                    glTranslatef(1.85, -0.6, rightWalls[i]);
-                    glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
-                    drawBear();
-                glPopMatrix();
-                glDisable(GL_COLOR_MATERIAL);
-                glEnable(GL_LIGHTING);
-            }
-            else {
-                setMaterial("wall");
-                glPushMatrix();
-                    glTranslatef(1.85, -0.75, rightWalls[i]);
-                    glScalef(lengthOfRoad/3 + 0.1, 0.85, 1);
-                    glutSolidCube(1);
-                glPopMatrix();
-            }
+            glDisable(GL_LIGHTING);
+            glEnable(GL_COLOR_MATERIAL);
+            glPushMatrix();
+                glTranslatef(1.85, -0.6, rightWalls[i]);
+                glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                drawBear();
+            glPopMatrix();
+            glDisable(GL_COLOR_MATERIAL);
+            glEnable(GL_LIGHTING);
         }
     }
 }
