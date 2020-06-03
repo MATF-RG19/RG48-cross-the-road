@@ -323,8 +323,8 @@ static void on_timer(int value) {
         playerPosZ -= move;
         
         //ubrzanje nakon nekog vremena
-        if ((int)playerPosZ % 50 == 0)
-            move += 0.002;
+        if ((int)playerPosZ % 100 == 0)
+            move += 0.001;
         
         //nakon nekog vremena ce biti kraj igre
         //ako se pre toga ne pogine, kao pobeda
@@ -431,19 +431,20 @@ void drawGrass(void) {
     //jelkice
     glDisable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
-    for (int i=1; i<7; i++) {
-        glPushMatrix();
-            glTranslatef(2.95, -0.5, playerPosZ-i);
-            glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
-            drawTree();
-        glPopMatrix();
-    }
-    for (int i=1; i<7; i++) {
-        glPushMatrix();
-            glTranslatef(-0.45, -0.5, playerPosZ-i);
-            glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
-            drawTree();
-        glPopMatrix();
+    for (int j=10; (float)j > -500; j--) {
+        if (j < playerPosZ+2 && j > playerPosZ-12) {
+            glPushMatrix();
+                glTranslatef(2.95, -0.5, j);
+                glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                drawTree();
+            glPopMatrix();
+    
+            glPushMatrix();
+                glTranslatef(-0.45, -0.5, j);
+                glScalef(lengthOfRoad/4, lengthOfRoad/4, lengthOfRoad/4);
+                drawTree();
+            glPopMatrix();
+        }
     }
     glDisable(GL_COLOR_MATERIAL);
     glEnable(GL_LIGHTING);
@@ -677,8 +678,8 @@ void drawWalls() {
             indWalls = 1;
         }
         
-        if (leftWalls[i] != 0) {
-            if (leftWalls[i] % 10 == 0) {
+        if (leftWalls[i] < playerPosZ+2 && leftWalls[i] > playerPosZ-12) {
+            if (leftWalls[i] % 5 == 0) {
                 glDisable(GL_LIGHTING);
                 glEnable(GL_COLOR_MATERIAL);
                 glPushMatrix();
@@ -699,8 +700,8 @@ void drawWalls() {
             }
         }
         
-        if (midWalls[i] != 0) {
-            if (midWalls[i] % 10 == 0) {
+        if (midWalls[i] < playerPosZ+2 && midWalls[i] > playerPosZ-12) {
+            if (midWalls[i] % 5 == 0) {
                 glDisable(GL_LIGHTING);
                 glEnable(GL_COLOR_MATERIAL);
                 glPushMatrix();
@@ -721,8 +722,8 @@ void drawWalls() {
             }
         }
         
-        if (rightWalls[i] != 0) {
-            if (midWalls[i] % 10 == 0) {
+        if (rightWalls[i] < playerPosZ+2 && rightWalls[i] > playerPosZ-12) {
+            if (midWalls[i] % 5 == 0) {
                 glDisable(GL_LIGHTING);
                 glEnable(GL_COLOR_MATERIAL);
                 glPushMatrix();
